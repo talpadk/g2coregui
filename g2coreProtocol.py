@@ -3,14 +3,15 @@ import json;
 
 
 class g2coreProtocol:
-    MAX_RX_LENGTH=1024*100;
-    RX_CUNCK_SIZE = 1024;
-
-    serialPort = None;
-    buffer = bytearray();
-
-    
+   
     def __init__(self):
+        self.MAX_RX_LENGTH=1024*100
+        self.RX_CUNCK_SIZE = 1024
+        self.MAX_TX_BUFFERS = 4
+        
+        self.txBuffersInUse = 0
+       
+        self.buffer = bytearray();
         self.serialPort = serial.Serial(port='/dev/ttyACM0', baudrate=115000, timeout=0.01);
 
     def animate(self):
@@ -33,8 +34,25 @@ class g2coreProtocol:
             if lineAsJson != None:
                 if 'f' in lineAsJson:
                     footer = lineAsJson['f'];
+                if 'r' in lineAsJson:
+                    self.txBuffersInUse -= 1
+                    if self.txBuffersInUse<0:
+                        self.txBuffersInUse=0
             self.buffer = self.buffer[newlinePos+1:];
-            return lineAsJson;
+            return line;
 
     def sendLine(self, data):
         self.serialPort.write((data+"\n").encode('utf-8'));
+        self.txBuffersInUse += 1
+
+    def hasFreeTxBuffers(self):
+        if self.txBuffersInUse < self.MAX_TX_BUFFERS:
+            return True
+        else:
+            return False
+        
+    def txIdle(self):
+        if self.txBuffersInUse==0:
+            return True
+        else:
+            return False
