@@ -17,17 +17,27 @@ if os.path.exists(pathToSend) and False:
     print "'"+pathToSend+"' already exists, aborting for human safety reasons!!!";
 else:
     while True:
+        #time.sleep(0.5)
         protocol.animate()
-        coreLine = protocol.getLine()
-        if coreLine != None:
-            print "<- "+coreLine
-
+        while (True):
+            coreLine = protocol.getLine()
+            if coreLine != None:
+                print "<- "+coreLine
+            else:
+                break
+            
         if os.path.isfile(pathToSend):
             print "New file detected"
             gCode = gcodeFile.gcodeFile(pathToSend)
             while(True):
+                #time.sleep(0.1)
                 protocol.animate()
-                coreLine = protocol.getLine()
+                while (True):
+                    coreLine = protocol.getLine()
+                    if coreLine != None:
+                        print "<- "+coreLine
+                    else:
+                        break
                 if coreLine != None:
                     print "<- "+coreLine
                 if protocol.hasFreeTxBuffers():
