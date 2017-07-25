@@ -1,17 +1,33 @@
-import g2coreProtocol;
-import time;
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import wx
+import gettext
+import g2coreGuiLayout
+import g2coreGuiBackend
 
 
 
-protocol = g2coreProtocol.g2coreProtocol();
+class G2coreGui(wx.App):
+    def OnInit(self):
+        mainFrame = g2coreGuiLayout.MainFrame(None, wx.ID_ANY, "")
+        self.SetTopWindow(mainFrame)
+        mainFrame.Show()
+        return True
 
-protocol.sendLine('{"sr":n}');
-protocol.sendLine('{"xfr":100}');
-protocol.sendLine('{"gc":"G1 X1 F1000"}');
+class myTimer(wx.Timer):
+    def __init__(self):
+        wx.Timer.__init__(self)
+        self.Start(10)
 
-#protocol.sendLine('{"gc":"G1 X2 F2"}');
-while(True):
-    protocol.animate();
-    line = protocol.getLine();
-    if (line != None):
-        print line;
+    def Notify(self):
+        global backend
+        backend.animate()
+
+    
+if __name__ == "__main__":
+    gettext.install("app") # replace with the appropriate catalog name
+
+    app = G2coreGui(0)
+    timer = myTimer()
+    app.MainLoop()    
