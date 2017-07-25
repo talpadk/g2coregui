@@ -18,3 +18,9 @@ class gcodeFile:
             return result
         else:
             return None
+
+    def hasMoreData(self):
+        if self.position<self.numberOfLines:
+            return True
+        else:
+            return False

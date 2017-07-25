@@ -4,12 +4,49 @@ import os.path;
 import time;
 import g2coreProtocol;
 import gcodeFile;
+from datetime import datetime
 
 protocol = g2coreProtocol.g2coreProtocol();
 
 pathToSend = "autosend.nc";
+protocol.MAX_TX_BUFFERS = 1 #Overwrite the default setting
+includeDateTimeStamp = False
+burstTxEnabled = True #If true send more than one line before serviceing the RX 
 
-
+def getLogLinePrefix():
+    global protocol
+    global includeDateTimeStamp
+    dt = datetime.now()
+    if includeDateTimeStamp:
+        prefix = "%04u-%02u-%02u %02u:%02u:%02u:%03u %01u/%01u" % (dt.year,dt.month,dt.day,dt.hour,dt.minute,dt.second,int(dt.microsecond/1000),protocol.txBuffersInUse,protocol.MAX_TX_BUFFERS)
+    else:
+        prefix = "%02u:%02u:%02u:%03u %01u/%01u" % (dt.hour,dt.minute,dt.second,int(dt.microsecond/1000),protocol.txBuffersInUse,protocol.MAX_TX_BUFFERS)
+    return prefix;
+    
+def receiveFunction():
+    global protocol
+    while (True):
+        prefix = getLogLinePrefix()
+        coreLine = protocol.getLine()
+        if coreLine != None:
+            print prefix+" <- "+coreLine
+        else:
+            break
+        
+def sendFunction():
+    global protocol
+    global burstTxEnabled
+    while protocol.hasFreeTxBuffers():
+        prefix = getLogLinePrefix()
+        line = gCode.getLine()
+        if line == None:
+            break
+        line = '{"gc":"'+line+'"}'
+        protocol.sendLine(line)
+        print prefix+" -> "+line
+        if not burstTxEnabled:
+            break
+        
 print "Copy the file to send to: '"+pathToSend+"' when done it will be deleted!!!"
 print "Ctrl+C to stop"
 
@@ -19,37 +56,19 @@ else:
     while True:
         #time.sleep(0.5)
         protocol.animate()
-        while (True):
-            coreLine = protocol.getLine()
-            if coreLine != None:
-                print "<- "+coreLine
-            else:
-                break
+        receiveFunction()
             
         if os.path.isfile(pathToSend):
             print "New file detected"
             gCode = gcodeFile.gcodeFile(pathToSend)
-            while(True):
+            while(gCode.hasMoreData()):
                 #time.sleep(0.1)
                 protocol.animate()
-                while (True):
-                    coreLine = protocol.getLine()
-                    if coreLine != None:
-                        print "<- "+coreLine
-                    else:
-                        break
-                while protocol.hasFreeTxBuffers():
-                    line = gCode.getLine()
-                    if line == None:
-                        break
-                    line = '{"gc":"'+line+'"}'
-                    protocol.sendLine(line)
-                    print "-> "+line
-            #Wait for the rest of the lines to have been send (they might still be executeing)
+                receiveFunction()
+                sendFunction()
+                #Wait for the rest of the lines to have been send (they might still be executeing)
             while(not protocol.txIdle()):
                 protocol.animate()
-                coreLine = protocol.getLine()
-                if coreLine != None:
-                    print "<- "+coreLine
+                receiveFunction()
             os.remove(pathToSend)
-            print "Done"
+            print "Done sending"
