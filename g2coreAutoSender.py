@@ -38,8 +38,6 @@ else:
                         print "<- "+coreLine
                     else:
                         break
-                if coreLine != None:
-                    print "<- "+coreLine
                 if protocol.hasFreeTxBuffers():
                     line = gCode.getLine()
                     if line == None:
