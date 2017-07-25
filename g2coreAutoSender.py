@@ -12,7 +12,7 @@ pathToSend = "autosend.nc";       # Name of the file to send and delete
 protocol.MAX_TX_BUFFERS = 4       # Overwrite the default setting (4) of how many non ack'ed messages are allowed
 includeDateTimeStamp = False      # If true the output will also include the date in the timestamps
 burstTxEnabled = True             # If true send more than one line before serviceing the RX 
-burstTxOnlyOnce = True            # Only do it once, then disable the feature
+burstTxOnlyOnce = False           # Only do it once, then disable the feature
 artificialDelay = 0               # Add this much artificial delay [seconds] during transmision of lines
 
 def getLogLinePrefix():
@@ -20,9 +20,9 @@ def getLogLinePrefix():
     global includeDateTimeStamp
     dt = datetime.now()
     if includeDateTimeStamp:
-        prefix = "%04u-%02u-%02u %02u:%02u:%02u:%03u %01u/%01u" % (dt.year,dt.month,dt.day,dt.hour,dt.minute,dt.second,int(dt.microsecond/1000),protocol.txBuffersInUse,protocol.MAX_TX_BUFFERS)
+        prefix = "%04u-%02u-%02u %02u:%02u:%02u.%03u %01u/%01u" % (dt.year,dt.month,dt.day,dt.hour,dt.minute,dt.second,int(dt.microsecond/1000),protocol.txBuffersInUse,protocol.MAX_TX_BUFFERS)
     else:
-        prefix = "%02u:%02u:%02u:%03u %01u/%01u" % (dt.hour,dt.minute,dt.second,int(dt.microsecond/1000),protocol.txBuffersInUse,protocol.MAX_TX_BUFFERS)
+        prefix = "%02u:%02u:%02u.%03u %01u/%01u" % (dt.hour,dt.minute,dt.second,int(dt.microsecond/1000),protocol.txBuffersInUse,protocol.MAX_TX_BUFFERS)
     return prefix;
     
 def receiveFunction():
@@ -43,7 +43,8 @@ def sendFunction():
         line = gCode.getLine()
         if line == None:
             break
-        line = '{"gc":"'+line+'"}'
+        #Don't wrap G-Code i json as a work around for g2core issue #287
+        #line = '{"gc":"'+line+'"}'
         protocol.sendLine(line)
         print prefix+" -> "+line
         if not burstTxEnabled:
