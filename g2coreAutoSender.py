@@ -9,9 +9,11 @@ from datetime import datetime
 protocol = g2coreProtocol.g2coreProtocol();
 
 pathToSend = "autosend.nc";
-protocol.MAX_TX_BUFFERS = 1 #Overwrite the default setting
+protocol.MAX_TX_BUFFERS = 4 #Overwrite the default setting
 includeDateTimeStamp = False
 burstTxEnabled = True #If true send more than one line before serviceing the RX 
+burstTxOnlyOnce = True
+artificialDelay = 0
 
 def getLogLinePrefix():
     global protocol
@@ -46,6 +48,8 @@ def sendFunction():
         print prefix+" -> "+line
         if not burstTxEnabled:
             break
+    if burstTxOnlyOnce:
+        burstTxEnabled = False
         
 print "Copy the file to send to: '"+pathToSend+"' when done it will be deleted!!!"
 print "Ctrl+C to stop"
@@ -54,7 +58,6 @@ if os.path.exists(pathToSend) and False:
     print "'"+pathToSend+"' already exists, aborting for human safety reasons!!!";
 else:
     while True:
-        #time.sleep(0.5)
         protocol.animate()
         receiveFunction()
             
@@ -62,7 +65,8 @@ else:
             print "New file detected"
             gCode = gcodeFile.gcodeFile(pathToSend)
             while(gCode.hasMoreData()):
-                #time.sleep(0.1)
+                if (artificialDelay>0.0001):
+                    time.sleep(artificialDelay)
                 protocol.animate()
                 receiveFunction()
                 sendFunction()
