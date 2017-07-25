@@ -7,7 +7,7 @@ class g2coreProtocol:
     def __init__(self):
         self.MAX_RX_LENGTH=1024*100
         self.RX_CUNCK_SIZE = 1024
-        self.MAX_TX_BUFFERS = 1
+        self.MAX_TX_BUFFERS = 4
         
         self.txBuffersInUse = 0
        
