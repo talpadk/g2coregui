@@ -51,6 +51,8 @@ class MainFrame(wx.Frame):
         application.backend.appendUserCommandToQueue(self.manualInput.GetValue())
         self.manualInput.Clear()
 
-        
+    def updateLog(self, logHistory):
+        self.log.SetValue(logHistory.getLastNLinesAsText(100))
+        self.log.SetInsertionPointEnd()
         
 # end of class MainFrame

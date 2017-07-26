@@ -8,9 +8,9 @@ import g2coreGuiBackend
 
 class G2coreGui(wx.App):
     def OnInit(self):
-        mainFrame = g2coreGuiLayout.MainFrame(None, wx.ID_ANY, "")
-        self.SetTopWindow(mainFrame)
-        mainFrame.Show()
+        self.mainFrame = g2coreGuiLayout.MainFrame(None, wx.ID_ANY, "")
+        self.SetTopWindow(self.mainFrame)
+        self.mainFrame.Show()
         self.backend = g2coreGuiBackend.g2coreGuiBackend(self)
         self.protocol = g2coreProtocol.g2coreProtocol() #should be done as a UI event
         self.backend.setProtocol(self.protocol)
@@ -25,6 +25,9 @@ class myTimer(wx.Timer):
 
     def Notify(self):
         self.backend.animate()
+        if self.backend.logHistory.hasChanges():
+            application = wx.App.Get()
+            application.mainFrame.updateLog(self.backend.logHistory)
 
     
 if __name__ == "__main__":

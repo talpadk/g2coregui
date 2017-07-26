@@ -1,8 +1,11 @@
+import g2coreGuiBackendLogHistory
+
 class g2coreGuiBackend:
     def __init__(self, application):
         self.protocol = None
         self.application = application
         self.userCommandQueue = []
+        self.logHistory = g2coreGuiBackendLogHistory.g2coreGuiBackendLogHistory()
         
     def setProtocol(self, protocol):
         self.protocol = protocol
@@ -14,7 +17,7 @@ class g2coreGuiBackend:
 #                prefix = getLogLinePrefix()
                 coreLine = self.protocol.getLine()
                 if coreLine != None:
-                    print " <- "+coreLine
+                    self.logHistory.addLine(0, coreLine)
                 else:
                     break
                 
@@ -26,7 +29,7 @@ class g2coreGuiBackend:
                         command = self.userCommandQueue.pop(0)
                     if command != None:
                         self.protocol.sendLine(command)
-                        print " -> "+command
+                        self.logHistory.addLine(1, command)
                     else:
                         moreDataToSend = False
                 else:
