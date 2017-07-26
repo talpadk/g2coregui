@@ -1,7 +1,9 @@
 class g2coreGuiBackend:
-    def __init__(self):
+    def __init__(self, application):
         self.protocol = None
-
+        self.application = application
+        self.userCommandQueue = []
+        
     def setProtocol(self, protocol):
         self.protocol = protocol
 
@@ -15,3 +17,20 @@ class g2coreGuiBackend:
                     print " <- "+coreLine
                 else:
                     break
+                
+            moreDataToSend = True
+            while moreDataToSend:
+                if self.protocol.hasFreeTxBuffers:
+                    command = None
+                    if len(self.userCommandQueue)>0:
+                        command = self.userCommandQueue.pop(0)
+                    if command != None:
+                        self.protocol.sendLine(command)
+                        print " -> "+command
+                    else:
+                        moreDataToSend = False
+                else:
+                    moreDataToSend = False
+                
+    def appendUserCommandToQueue(self, command):
+        self.userCommandQueue.append(command)
