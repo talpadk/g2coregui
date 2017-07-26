@@ -15,7 +15,6 @@ class G2coreGui(wx.App):
         self.protocol = g2coreProtocol.g2coreProtocol() #should be done as a UI event
         self.backend.setProtocol(self.protocol)
         self.timer = myTimer(self.backend)
-        self.backend.appendUserCommandToQueue('G1 X10 F100')
         return True
 
 class myTimer(wx.Timer):
