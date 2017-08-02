@@ -10,10 +10,12 @@ class g2coreProtocol:
         self.MAX_TX_BUFFERS = 4
         
         self.txBuffersInUse = 0
+        self.lineAsJson = None
        
         self.buffer = bytearray();
-        self.serialPort = serial.Serial(port='/dev/ttyACM0', baudrate=115000, timeout=0.01, rtscts=True);
+        self.serialPort = serial.Serial(port='/dev/ttyACM0', baudrate=115000, timeout=0.01, rtscts=True)
 
+        
     def animate(self):
         input = self.serialPort.read(self.RX_CUNCK_SIZE);
         if len(self.buffer) + len(input) > self.MAX_RX_LENGTH:
@@ -25,22 +27,25 @@ class g2coreProtocol:
         if newlinePos == -1:
             return None;
         else:
-            lineAsJson = None;
+            self.lineAsJson = None;
             line = self.buffer[0:newlinePos].decode('utf-8');
             try:
-                lineAsJson = json.loads(line);
+                self.lineAsJson = json.loads(line);
             except:
                 {}
-            if lineAsJson != None:
-                if 'f' in lineAsJson:
-                    footer = lineAsJson['f'];
-                if 'r' in lineAsJson:
+            if self.lineAsJson != None:
+                if 'f' in self.lineAsJson:
+                    footer = self.lineAsJson['f'];
+                if 'r' in self.lineAsJson:
                     self.txBuffersInUse -= 1
                     if self.txBuffersInUse<0:
                         self.txBuffersInUse=0
             self.buffer = self.buffer[newlinePos+1:];
             #print "on rx "+str(self.txBuffersInUse)
             return line;
+
+    def getLastLineAsJson(self):
+        return self.lineAsJson
 
     def sendLine(self, data):
         self.serialPort.write((data+"\n").encode('utf-8'));

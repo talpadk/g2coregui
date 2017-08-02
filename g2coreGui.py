@@ -24,10 +24,11 @@ class myTimer(wx.Timer):
 
     def Notify(self):
         self.backend.animate()
+        application = wx.App.Get()
         if self.backend.logHistory.hasChanges():
-            application = wx.App.Get()
             application.mainFrame.updateLog(self.backend.logHistory)
-
+        if self.backend.digitalReadOut.hasChanges():
+            application.mainFrame.updateDRO(self.backend.digitalReadOut)
     
 if __name__ == "__main__":
     gettext.install("app") # replace with the appropriate catalog name

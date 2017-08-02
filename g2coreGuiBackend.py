@@ -1,11 +1,13 @@
 import g2coreGuiBackendLogHistory
+import g2coreGuiBackendDRO
 
 class g2coreGuiBackend:
     def __init__(self, application):
         self.protocol = None
         self.application = application
-        self.userCommandQueue = []
+        self.userCommandQueue = ['{"sr":n}']
         self.logHistory = g2coreGuiBackendLogHistory.g2coreGuiBackendLogHistory()
+        self.digitalReadOut = g2coreGuiBackendDRO.g2coreGuiBackendDRO()
         
     def setProtocol(self, protocol):
         self.protocol = protocol
@@ -18,6 +20,10 @@ class g2coreGuiBackend:
                 coreLine = self.protocol.getLine()
                 if coreLine != None:
                     self.logHistory.addLine(0, coreLine)
+                    data = self.protocol.getLastLineAsJson()
+                    if data != None:
+                        self.digitalReadOut.animate(data)
+                    
                 else:
                     break
                 

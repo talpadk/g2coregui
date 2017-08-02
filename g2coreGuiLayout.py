@@ -18,9 +18,12 @@ class MainFrame(wx.Frame):
     def __init__(self, *args, **kwds):
         # begin wxGlade: MainFrame.__init__
         wx.Frame.__init__(self, *args, **kwds)
-        self.terminal = wx.Panel(self, wx.ID_ANY)
-        self.log = wx.TextCtrl(self.terminal, wx.ID_ANY, "", style=wx.TE_MULTILINE | wx.TE_READONLY)
-        self.manualInput = wx.TextCtrl(self.terminal, wx.ID_ANY, "", style=wx.TE_PROCESS_ENTER)
+        self.window_1 = wx.SplitterWindow(self, wx.ID_ANY)
+        self.window_1_pane_1 = wx.Panel(self.window_1, wx.ID_ANY)
+        self.digitalReadOut = wx.TextCtrl(self.window_1_pane_1, wx.ID_ANY, _("X: ?\nY: ?\nZ: ?\nA: ?"), style=wx.TE_DONTWRAP | wx.TE_MULTILINE | wx.TE_READONLY)
+        self.term = wx.Panel(self.window_1, wx.ID_ANY)
+        self.log = wx.TextCtrl(self.term, wx.ID_ANY, "", style=wx.TE_MULTILINE | wx.TE_READONLY)
+        self.manualInput = wx.TextCtrl(self.term, wx.ID_ANY, "", style=wx.TE_PROCESS_ENTER)
 
         self.__set_properties()
         self.__do_layout()
@@ -31,16 +34,21 @@ class MainFrame(wx.Frame):
     def __set_properties(self):
         # begin wxGlade: MainFrame.__set_properties
         self.SetTitle(_("g2coreGUI"))
+        self.digitalReadOut.SetFont(wx.Font(24, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, ""))
         # end wxGlade
 
     def __do_layout(self):
         # begin wxGlade: MainFrame.__do_layout
         sizer_1 = wx.BoxSizer(wx.VERTICAL)
-        terminalSizer = wx.BoxSizer(wx.VERTICAL)
+        terminalSizer = wx.StaticBoxSizer(wx.StaticBox(self.term, wx.ID_ANY, _("Terminal")), wx.VERTICAL)
+        sizer_3 = wx.StaticBoxSizer(wx.StaticBox(self.window_1_pane_1, wx.ID_ANY, _("DRO")), wx.VERTICAL)
+        sizer_3.Add(self.digitalReadOut, 1, wx.ALL | wx.EXPAND, 3)
+        self.window_1_pane_1.SetSizer(sizer_3)
         terminalSizer.Add(self.log, 1, wx.ALL | wx.EXPAND, 3)
         terminalSizer.Add(self.manualInput, 0, wx.ALL | wx.EXPAND, 3)
-        self.terminal.SetSizer(terminalSizer)
-        sizer_1.Add(self.terminal, 1, wx.EXPAND, 0)
+        self.term.SetSizer(terminalSizer)
+        self.window_1.SplitVertically(self.window_1_pane_1, self.term, 150)
+        sizer_1.Add(self.window_1, 1, wx.EXPAND, 0)
         self.SetSizer(sizer_1)
         sizer_1.Fit(self)
         self.Layout()
@@ -54,5 +62,13 @@ class MainFrame(wx.Frame):
     def updateLog(self, logHistory):
         self.log.SetValue(logHistory.getLastNLinesAsText(100))
         self.log.SetInsertionPointEnd()
+
+    def updateDRO(self, dro):
+        text = "";
+        text += "X: "+dro.getValueAsText("x")+"\n"
+        text += "Y: "+dro.getValueAsText("y")+"\n"
+        text += "Z: "+dro.getValueAsText("z")+"\n"
+        text += "A: "+dro.getValueAsText("a")+"\n"
+        self.digitalReadOut.SetValue(text)
         
 # end of class MainFrame
