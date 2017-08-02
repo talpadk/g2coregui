@@ -4,6 +4,13 @@ class g2coreGuiBackendDRO:
         self.changes = True
         self.positionInformation = {}
         
+    def getValue(self, name):
+        name = "pos"+name
+        if name in self.positionInformation:
+            return float(self.positionInformation[name])
+        else:
+            return None
+        
     def getValueAsText(self, name):
         name = "pos"+name
         if name in self.positionInformation:
