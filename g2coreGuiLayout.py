@@ -5,6 +5,7 @@
 #
 
 import wx
+import gcodeFile
 
 # begin wxGlade: dependencies
 import gettext
@@ -16,6 +17,9 @@ import gettext
 
 class MainFrame(wx.Frame):
     def __init__(self, *args, **kwds):
+        self.ID_MENU_OPEN_GCODE = wx.NewId()
+        self.ID_MENU_SEND_GCODE = wx.NewId()
+        
         # begin wxGlade: MainFrame.__init__
         wx.Frame.__init__(self, *args, **kwds)
         self.window_1 = wx.SplitterWindow(self, wx.ID_ANY)
@@ -40,6 +44,17 @@ class MainFrame(wx.Frame):
         self.step001 = wx.Button(self.notebook_2_pane_1, wx.ID_ANY, _("0.01"))
         self.step0001 = wx.Button(self.notebook_2_pane_1, wx.ID_ANY, _("0.001"))
         self.actualStepSize = wx.TextCtrl(self.notebook_2_pane_1, wx.ID_ANY, _("1"))
+        
+        # Menu Bar
+        self.mainFrame_menubar = wx.MenuBar()
+        wxglade_tmp_menu = wx.Menu()
+        wxglade_tmp_menu.Append(self.ID_MENU_OPEN_GCODE, _("&Open Gcode\tCTRL+O"), "", wx.ITEM_NORMAL)
+        self.mainFrame_menubar.Append(wxglade_tmp_menu, _("&File"))
+        wxglade_tmp_menu = wx.Menu()
+        wxglade_tmp_menu.Append(self.ID_MENU_SEND_GCODE, _("&Send Gcode"), "", wx.ITEM_NORMAL)
+        self.mainFrame_menubar.Append(wxglade_tmp_menu, _("&Tools"))
+        self.SetMenuBar(self.mainFrame_menubar)
+        # Menu Bar end
 
         self.__set_properties()
         self.__do_layout()
@@ -56,7 +71,12 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.onStepSize01, self.step01)
         self.Bind(wx.EVT_BUTTON, self.onStepSize001, self.step001)
         self.Bind(wx.EVT_BUTTON, self.onStepSize0001, self.step0001)
+        self.Bind(wx.EVT_MENU, self.onMenuOpenGcode, id=self.ID_MENU_OPEN_GCODE)
+        self.Bind(wx.EVT_MENU, self.onMenuSendGCode, id=self.ID_MENU_SEND_GCODE)
         # end wxGlade
+
+        self.openGcodeDialog = wx.FileDialog(self, message="Choose a Gcode file",
+                                             wildcard = "GCode files (*.nc;*.gcode;*.g)|*.nc;*.gcode;*.g|All files (*.*)|*.*",style=wx.FD_OPEN|wx.FD_FILE_MUST_EXIST)
 
     def __set_properties(self):
         # begin wxGlade: MainFrame.__set_properties
@@ -200,5 +220,14 @@ class MainFrame(wx.Frame):
         self.doJog(0,0,1, 0,0,0)
     def onJogZMinus(self, event):  # wxGlade: MainFrame.<event_handler>
         self.doJog(0,0,-1, 0,0,0)
+
+    def onMenuOpenGcode(self, event):  # wxGlade: MainFrame.<event_handler>
+        if self.openGcodeDialog.ShowModal() == wx.ID_OK:
+            application = wx.App.Get()
+            application.backend.setGCode(gcodeFile.gcodeFile(self.openGcodeDialog.GetPath()))
+
+    def onMenuSendGCode(self, event):  # wxGlade: MainFrame.<event_handler>
+        application = wx.App.Get()
+        application.backend.startSendingGCode()
 
 # end of class MainFrame
