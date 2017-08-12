@@ -38,7 +38,7 @@ class g2coreGuiBackend:
                 
             moreDataToSend = True
             while moreDataToSend:
-                if self.protocol.hasFreeTxBuffers:
+                if self.protocol.hasFreeTxBuffers():
                     command = None
                     if len(self.userCommandQueue)>0:
                         command = self.userCommandQueue.pop(0)
