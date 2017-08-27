@@ -62,7 +62,8 @@ class g2coreGuiBackend:
         strippedCommand = command.strip();
         if len(strippedCommand)>0:
             firstChar = strippedCommand[0]
-            if firstChar=="!" or firstChar=="%" or firstChar=="~":
+            #feedhold, queue flush, end feedhold, kill job and reset board 
+            if firstChar=="!" or firstChar=="%" or firstChar=="~" or firstChar==chr(4) or firstChar==chr(24):
                 isSpecialCommand = True
             
         if isSpecialCommand:
