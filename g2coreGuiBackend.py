@@ -58,4 +58,15 @@ class g2coreGuiBackend:
                     moreDataToSend = False
                 
     def appendUserCommandToQueue(self, command):
-        self.userCommandQueue.append(command)
+        isSpecialCommand = False
+        strippedCommand = command.strip();
+        if len(strippedCommand)>0:
+            firstChar = strippedCommand[0]
+            if firstChar=="!" or firstChar=="%" or firstChar=="~":
+                isSpecialCommand = True
+            
+        if isSpecialCommand:
+            self.protocol.sendSpecialCommand(strippedCommand) #Sending the stripped version to help with panicked
+            self.logHistory.addLine(1, strippedCommand)
+        else:
+            self.userCommandQueue.append(command)

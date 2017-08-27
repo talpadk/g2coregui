@@ -52,6 +52,10 @@ class g2coreProtocol:
         self.txBuffersInUse += 1
         #print "on tx "+str(self.txBuffersInUse)
 
+    #Method for sending the special single character commands that don't generate a response    
+    def sendSpecialCommand(self, data):
+        self.serialPort.write((data+"\n").encode('utf-8'));
+        
     def hasFreeTxBuffers(self):
         if self.txBuffersInUse < self.MAX_TX_BUFFERS:
             return True
