@@ -4,6 +4,7 @@ import sys
 import os
 scriptPath = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(scriptPath+"/backend")
+sys.path.append(scriptPath+"/frontend")
 
 import wx
 import gettext
