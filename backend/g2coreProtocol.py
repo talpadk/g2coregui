@@ -13,14 +13,16 @@ class g2coreProtocol:
         self.lineAsJson = None
        
         self.buffer = bytearray();
-        self.serialPort = serial.Serial(port='/dev/ttyACM0', baudrate=115000, timeout=0.01, rtscts=True)
+        self.serialPort = None
+#        self.serialPort = serial.Serial(port='/dev/ttyACM0', baudrate=115000, timeout=0.01, rtscts=True)
 
         
     def animate(self):
-        input = self.serialPort.read(self.RX_CUNCK_SIZE);
-        if len(self.buffer) + len(input) > self.MAX_RX_LENGTH:
-            self.buffer = bytearray();
-        self.buffer = self.buffer + input;
+        if self.serialPort != None:
+            input = self.serialPort.read(self.RX_CUNCK_SIZE);
+            if len(self.buffer) + len(input) > self.MAX_RX_LENGTH:
+                self.buffer = bytearray();
+                self.buffer = self.buffer + input;
 
     def getLine(self):
         newlinePos = self.buffer.find("\n")
@@ -48,13 +50,15 @@ class g2coreProtocol:
         return self.lineAsJson
 
     def sendLine(self, data):
-        self.serialPort.write((data+"\n").encode('utf-8'));
-        self.txBuffersInUse += 1
-        #print "on tx "+str(self.txBuffersInUse)
+        if self.serialPort != None:
+            self.serialPort.write((data+"\n").encode('utf-8'));
+            self.txBuffersInUse += 1
+            #print "on tx "+str(self.txBuffersInUse)
 
     #Method for sending the special single character commands that don't generate a response    
     def sendSpecialCommand(self, data):
-        self.serialPort.write((data+"\n").encode('utf-8'));
+        if self.serialPort != None:
+            self.serialPort.write((data+"\n").encode('utf-8'));
         
     def hasFreeTxBuffers(self):
         if self.txBuffersInUse < self.MAX_TX_BUFFERS:
