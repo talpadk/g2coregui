@@ -8,13 +8,13 @@ sys.path.append(scriptPath+"/frontend")
 
 import wx
 import gettext
-import g2coreGuiLayout
+import MainFrame
 import g2coreProtocol
 import g2coreGuiBackend
 
 class G2coreGui(wx.App):
     def OnInit(self):
-        self.mainFrame = g2coreGuiLayout.MainFrame(None, wx.ID_ANY, "")
+        self.mainFrame = MainFrame.MainFrame(None, wx.ID_ANY, "")
         self.SetTopWindow(self.mainFrame)
         self.mainFrame.Show()
         self.backend = g2coreGuiBackend.g2coreGuiBackend(self)
