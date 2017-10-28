@@ -26,7 +26,7 @@ class g2coreProtocol:
             input = self.serialPort.read(self.RX_CUNCK_SIZE);
             if len(self.buffer) + len(input) > self.MAX_RX_LENGTH:
                 self.buffer = bytearray();
-                self.buffer = self.buffer + input;
+            self.buffer = self.buffer + input;
 
     def getLine(self):
         newlinePos = self.buffer.find("\n")
