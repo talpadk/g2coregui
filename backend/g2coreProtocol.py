@@ -13,8 +13,12 @@ class g2coreProtocol:
         self.lineAsJson = None
        
         self.buffer = bytearray();
-        self.serialPort = None
-#        self.serialPort = serial.Serial(port='/dev/ttyACM0', baudrate=115000, timeout=0.01, rtscts=True)
+
+        try:
+            self.serialPort = serial.Serial(port='/dev/ttyACM0', baudrate=115000, timeout=0.01, rtscts=True)
+        except:
+            self.serialPort = None;
+            print "Failed to open serial port /dev/ttyACM0";
 
         
     def animate(self):
