@@ -5,6 +5,7 @@
 
 import wx
 import gcodeFile
+from GCodeTextViewer import GCodeTextViewer
 
 # begin wxGlade: dependencies
 # end wxGlade
@@ -40,6 +41,7 @@ class MainFrame(wx.Frame):
         self.log = wx.TextCtrl(self.notebook_3_pane_1, wx.ID_ANY, "", style=wx.TE_MULTILINE | wx.TE_READONLY)
         self.manualInput = wx.TextCtrl(self.notebook_3_pane_1, wx.ID_ANY, "", style=wx.TE_PROCESS_ENTER)
         self.notebook_3_pane_2 = wx.Panel(self.notebook_3, wx.ID_ANY)
+        self.gCodeTextViewer = GCodeTextViewer(self.notebook_3_pane_2, wx.ID_ANY)
         self.notebook_2 = wx.Notebook(self, wx.ID_ANY)
         self.notebook_2_pane_1 = wx.Panel(self.notebook_2, wx.ID_ANY)
         self.xMinus = wx.Button(self.notebook_2_pane_1, wx.ID_ANY, _("X-"))
@@ -109,6 +111,7 @@ class MainFrame(wx.Frame):
         terminalSizer.Add(self.log, 1, wx.ALL | wx.EXPAND, 3)
         terminalSizer.Add(self.manualInput, 0, wx.ALL | wx.EXPAND, 3)
         self.notebook_3_pane_1.SetSizer(terminalSizer)
+        sizer_4.Add(self.gCodeTextViewer, 1, wx.EXPAND, 0)
         self.notebook_3_pane_2.SetSizer(sizer_4)
         self.notebook_3.AddPage(self.notebook_3_pane_1, _("Term"))
         self.notebook_3.AddPage(self.notebook_3_pane_2, _("G-code"))
