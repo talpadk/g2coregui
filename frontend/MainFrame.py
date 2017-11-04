@@ -153,7 +153,9 @@ class MainFrame(wx.Frame):
     def onMenuOpenGcode(self, event):  # wxGlade: MainFrame.<event_handler>
         if self.openGcodeDialog.ShowModal() == wx.ID_OK:
             application = wx.App.Get()
-            application.backend.setGCode(gcodeFile.gcodeFile(self.openGcodeDialog.GetPath()))
+            gCodeFile = gcodeFile.gcodeFile(self.openGcodeDialog.GetPath())
+            application.backend.setGCode(gCodeFile)
+            self.gCodeTextViewer.setGCodeFile(gCodeFile)
 
     def onMenuSendGCode(self, event):  # wxGlade: MainFrame.<event_handler>
         application = wx.App.Get()
