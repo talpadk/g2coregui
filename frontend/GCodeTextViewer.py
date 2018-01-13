@@ -6,8 +6,10 @@ class GCodeTextRenderPanel(wx.Panel):
         wx.Panel.__init__(self, parent)
         self.parent = parent
         
-        self.gCodeFile = None #The g-code file we are rendering
-        self.offset = 0       #The current viewing offset
+        self.gCodeFile = None      #The g-code file we are rendering
+        self.offset = 0            #The current viewing offset
+        self.markerOffset = 16     #The space allocated for margin markers
+        self.nextLineToSend = 0    #The next g-code line that will be send
         self.drawingEnabled = False #Signals drawing okay, a workaround for a gtk late window creation issue
 
         self.numberOfVisibleLines = None
@@ -38,7 +40,29 @@ class GCodeTextRenderPanel(wx.Panel):
         self.offset = offset
         if self.offset != oldOffset:
             self.drawText()
+
+    def drawMarkers(self, externalDc=None):
+        if (not self.drawingEnabled):
+            return
+        if (externalDc == None):
+            dc = wx.AutoBufferedPaintDC(self)
+        else:
+            dc = externalDc
+            
+        lineHeight = dc.GetCharHeight();
+        dcSize = dc.GetSize();
+
+        dc.SetPen(wx.Pen(colour=wx.Colour(240,240,240), width=1))
+        dc.SetBrush(wx.Brush(colour=wx.Colour(240,240,240), style=wx.BRUSHSTYLE_SOLID))
+        dc.DrawRectangle(0,0, self.markerOffset-1, dcSize.GetHeight())
+
         
+        dc.SetPen(wx.Pen(colour=wx.Colour(200,0,0), width=1))
+        dc.SetBrush(wx.Brush(colour=wx.Colour(255,0,0), style=wx.BRUSHSTYLE_SOLID))
+
+        nextLineMidPoint = lineHeight * (0.5+self.nextLineToSend - self.offset);
+        dc.DrawPolygon(points=(wx.Point(0,0), wx.Point(-4,-4), wx.Point(-4,4)), xoffset=self.markerOffset-4, yoffset=nextLineMidPoint)
+            
     def drawText(self):
         if (not self.drawingEnabled):
             return
@@ -57,8 +81,9 @@ class GCodeTextRenderPanel(wx.Panel):
             for i in range(self.numberOfVisibleLines+1):
                 text = self.gCodeFile.getLineN(i+self.offset)
                 if text != None:
-                    dc.DrawText(text,0,yPosition)
+                    dc.DrawText(text,self.markerOffset,yPosition)
                     yPosition = yPosition+lineHeight
+            self.drawMarkers(externalDc=dc)
         self.parent.calculateScrollBarSize()            
         
 
