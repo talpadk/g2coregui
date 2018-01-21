@@ -11,7 +11,8 @@ class GCodeTextRenderPanel(wx.Panel):
         self.markerOffset = 16     #The space allocated for margin markers
         self.nextLineToSend = 0    #The next g-code line that will be send
         self.drawingEnabled = False #Signals drawing okay, a workaround for a gtk late window creation issue
-
+        self.autoScroll = True     #If true the display automatically keeps the next send line in view
+        
         self.numberOfVisibleLines = None
         
         self.SetBackgroundStyle(wx.BG_STYLE_CUSTOM)
@@ -41,6 +42,20 @@ class GCodeTextRenderPanel(wx.Panel):
         if self.offset != oldOffset:
             self.drawText()
 
+    def updateGCodePosition(self, nextLineToSend):
+        if nextLineToSend != self.nextLineToSend:
+            self.nextLineToSend = nextLineToSend
+            if self.autoScroll:
+                newOffset = nextLineToSend-2
+                if newOffset < 0:
+                    newOffset = 0;
+                if newOffset != self.offset:
+                    self.setScrollOffset(newOffset) #scrolling causes the markers to be redrawn
+                else:
+                    self.drawMarkers()
+            else:
+                self.drawMarkers()
+            
     def drawMarkers(self, externalDc=None):
         if (not self.drawingEnabled):
             return
@@ -108,6 +123,11 @@ class GCodeTextViewer(wx.Panel):
     def setGCodeFile(self, gCodeFile):
         self.render.setGCodeFile(gCodeFile)
         self.calculateScrollBarSize()
+
+    def updateGCodePosition(self, nextLineToSend):
+        self.render.updateGCodePosition(nextLineToSend)
+        if self.render.offset != self.scrollBar.GetThumbPosition():
+            self.scrollBar.SetThumbPosition(self.render.offset)
         
     def calculateScrollBarSize(self):
         numberOfLinesInFile = 1

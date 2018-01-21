@@ -35,7 +35,10 @@ class myTimer(wx.Timer):
             application.mainFrame.updateLog(self.backend.logHistory)
         if self.backend.digitalReadOut.hasChanges():
             application.mainFrame.updateDRO(self.backend.digitalReadOut)
-    
+        gCode = self.backend.getGCode();
+        if gCode != None:
+            application.mainFrame.updateGCodePosition(gCode.getNextLineNumber())
+                                                  
 if __name__ == "__main__":
     gettext.install("app") # replace with the appropriate catalog name
 

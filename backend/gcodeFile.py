@@ -25,6 +25,10 @@ class gcodeFile:
         else:
             return None;
 
+    #Returns the next line number that will be send (0 offset)
+    def getNextLineNumber(self):
+        return self.position
+    
     def getNumberOfLines(self):
         return self.numberOfLines
         

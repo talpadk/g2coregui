@@ -18,6 +18,9 @@ class g2coreGuiBackend:
     def setGCode(self, gCode):
         self.gCode = gCode
 
+    def getGCode(self):
+        return self.gCode
+        
     def startSendingGCode(self):
         self.isSendingGCode = True
         

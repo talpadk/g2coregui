@@ -226,6 +226,9 @@ class MainFrame(wx.Frame):
         text += "Z: "+dro.getValueAsText("z")+"\n"
         text += "A: "+dro.getValueAsText("a")+"\n"
         self.digitalReadOut.SetValue(text)
+
+    def updateGCodePosition(self, nextLineToSend):
+        self.gCodeTextViewer.updateGCodePosition(nextLineToSend)
         
     def onStepSize10(self, event):  # wxGlade: MainFrame.<event_handler>
         self.actualStepSize.SetValue(str(10))
